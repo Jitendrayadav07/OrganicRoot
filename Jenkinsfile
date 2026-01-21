@@ -2,15 +2,27 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+
+        stage('Clone Code') {
             steps {
-                checkout scm
+                git branch: 'main',
+                    url: 'https://github.com/<username>/<repo-name>.git'
             }
         }
 
-        stage('Verify') {
+        stage('Install Dependencies') {
             steps {
-                echo 'Jenkinsfile detected successfully'
+                sh 'npm install'
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                sh '''
+                npm install -g pm2
+                pm2 stop node-app || true
+                pm2 start npm --name node-app -- start
+                '''
             }
         }
     }
